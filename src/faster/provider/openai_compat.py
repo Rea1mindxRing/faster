@@ -110,10 +110,10 @@ class OpenAICompatProvider:
             content = delta.get("content")
             # reasoning deltas count as tokens too (see module docstring);
             # a chunk with both fields is still exactly one arrival
-            is_token = (isinstance(content, str) and content) or (
-                isinstance(delta.get("reasoning"), str) and delta["reasoning"]
-            ) or (
-                isinstance(delta.get("reasoning_content"), str) and delta["reasoning_content"]
+            is_token = (
+                (isinstance(content, str) and content)
+                or (isinstance(delta.get("reasoning"), str) and delta["reasoning"])
+                or (isinstance(delta.get("reasoning_content"), str) and delta["reasoning_content"])
             )
             if is_token:
                 text = content if isinstance(content, str) and content else ""
