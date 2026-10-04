@@ -1,0 +1,59 @@
+name: Bug report / Bug 报告
+description: Report a problem with faster / faster 本身出了问题
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time! For security issues, email 2874932278@qq.com instead (see SECURITY.md).
+        感谢反馈！安全问题请发邮件（见 SECURITY.md），不要公开提。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened? / 发生了什么
+      description: Expected vs actual. 预期与实际行为。
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command / 使用的命令
+      placeholder: |
+        faster bench --base-url http://localhost:11434/v1 --model qwen3:8b \
+            --num-requests 20 --concurrency 4
+    validations:
+      required: true
+  - type: textarea
+    id: terminal-output
+    attributes:
+      label: Terminal output / 终端输出
+      description: |
+        Paste the full summary table and any error lines.
+        **If you have the --json report, attach it** — raw records let us
+        recompute every metric and pinpoint the bug fast.
+        完整输出；如有可能附上 --json 报告（原始记录能让我们快速定位）。
+    validations:
+      required: true
+  - type: input
+    id: endpoint
+    attributes:
+      label: Endpoint type / 被测端点
+      description: e.g. Ollama 0.12, vLLM v0.11, llama.cpp b8xxx, OpenAI API
+  - type: input
+    id: version
+    attributes:
+      label: faster version / faster 版本
+      placeholder: "0.1.0 (or commit hash)"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS / 操作系统
+      options:
+        - Linux
+        - Windows (WSL)
+        - Windows (native Python)
+        - macOS
+    validations:
+      required: true

@@ -1,0 +1,5 @@
+# Default owner for everything - reviews are requested from the maintainer.
+# When co-maintainers join, split by area, e.g.:
+#   /src/faster/metrics/   @Rea1mindxRing @alice
+#   /src/faster/engine/    @Rea1mindxRing @bob
+* @Rea1mindxRing
