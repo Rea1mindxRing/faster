@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Benchmark outputs
+results/
+*.faster.json
+*.faster.html
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store

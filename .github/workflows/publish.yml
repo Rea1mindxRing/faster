@@ -1,0 +1,39 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify tag matches pyproject version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PYPROJECT_VERSION="$(grep -m1 '^version' pyproject.toml | sed 's/version = "\(.*\)"/\1/')"
+          if [ "$TAG_VERSION" != "$PYPROJECT_VERSION" ]; then
+            echo "::error::tag v$TAG_VERSION != pyproject version $PYPROJECT_VERSION"
+            echo "Update pyproject.toml AND CHANGELOG.md before tagging."
+            exit 1
+          fi
+          if ! grep -q "^\#\# \[$TAG_VERSION\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## [$TAG_VERSION]' entry"
+            echo "Every release must have a changelog entry (Keep a Changelog format)."
+            exit 1
+          fi
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Build
+        run: uv build
+
+      - name: Publish (trusted publishing)
+        uses: pypa/gh-action-pypi-publish@release/v1
