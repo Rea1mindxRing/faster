@@ -28,6 +28,33 @@ different things in different tools, and empty datasets silently report 0 ms.
 | **Reports** | JSON (raw records), rich terminal table, single-file HTML (inline SVG charts, zero JS dependencies) |
 | **Dual entry** | `faster bench` CLI, or embed the SDK in your own evaluation pipeline |
 
+## Real hardware, real numbers / 真机实测
+
+`faster sweep` on a laptop RTX 5060 (8 GB), qwen3:8b Q4_K_M served by Ollama
+(single execution slot), 8 requests per level, max_tokens 1024 —
+[full report](docs/examples/qwen3-8b-rtx5060-sweep.html) ·
+[raw records](docs/examples/qwen3-8b-rtx5060-sweep.json):
+
+![faster sweep on qwen3:8b](docs/examples/sweep-throughput.png)
+
+![TTFT vs concurrency](docs/examples/sweep-ttft.png)
+
+**What the two curves say** (all computed with the same documented formulas):
+
+- Throughput is **flat at ~52 tok/s** regardless of concurrency: Ollama's single
+  slot serializes requests — extra concurrency only queues
+- TTFT **collapses** from 0.4 s to 45 s as requests pile up behind complete
+  generations — queueing time is inside TTFT by definition
+- At c=8 three requests exceed the 120 s timeout and are reported as isolated
+  errors instead of silently corrupting the percentiles
+
+Reproduce it yourself:
+
+```bash
+faster sweep --base-url http://localhost:11434/v1 --model qwen3:8b \
+    --concurrency 1,2,4,8 --num-requests 8 --max-tokens 1024
+```
+
 ## Quick start
 
 ```bash
@@ -123,6 +150,28 @@ faster bench --base-url http://localhost:11434/v1 --model qwen2.5:7b \
 
 faster sweep --base-url http://localhost:8000/v1 --model my-model \
     --concurrency 1,2,4,8,16 --num-requests 200
+```
+
+## 真机实测数据
+
+在 RTX 5060 笔记本（8GB）上运行 `faster sweep`：qwen3:8b Q4_K_M，Ollama 单槽位，每档 8 个请求，max_tokens 1024——
+[完整报告](docs/examples/qwen3-8b-rtx5060-sweep.html) · [原始记录](docs/examples/qwen3-8b-rtx5060-sweep.json)
+
+![吞吐曲线](docs/examples/sweep-throughput.png)
+
+![TTFT 曲线](docs/examples/sweep-ttft.png)
+
+**两条曲线的解读**（全部由同一套文档化公式计算）：
+
+- 吞吐在 ~52 tok/s 处**纹丝不动**：Ollama 单槽位串行处理请求，加并发只是排队
+- TTFT 从 0.4s **恶化**到 45s：排队时间按口径计入 TTFT
+- c=8 时 3 个请求超过 120s 默认超时，被隔离记为错误——而不是悄悄污染分位数
+
+复现命令：
+
+```bash
+faster sweep --base-url http://localhost:11434/v1 --model qwen3:8b \
+    --concurrency 1,2,4,8 --num-requests 8 --max-tokens 1024
 ```
 
 ## 路线图
